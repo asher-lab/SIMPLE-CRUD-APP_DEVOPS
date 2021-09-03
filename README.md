@@ -1,5 +1,10 @@
 #  Implement DevOps process and principles on Hospital Management System
 
+##  System Requirements: 
+1. These are the necessary components in order to implement DevOps processes in the system:
+	- Docker Runtime and docker compose. || Needs to be in remote server and local.
+	- Jenkins || Needs to be in local server. || You are working on a multi branch pipeline
+	- Git || Gitlab https://gitlab.com/asher-lab/SIMPLE-CRUD-APP_DEVOPS
 
 
 ## 🧊 Development
@@ -18,10 +23,15 @@ Step 1: Push your code changes to `YOUR-BRANCH`
 commands
 ```
 Step 2: Merge `YOUR-BRANCH` to `MAIN`
+```
+1.  git checkout <branch name>
+2.  git merge main
+https://www.varonis.com/blog/git-branching/
+```
 ## 🧊Webhooks
 Build the project when triggered using Jenkins
 ```
-commands
+Implement using Gitlab and Jenkins
 ```
 ## 🧊Testing 
 
@@ -31,7 +41,7 @@ commands
 ## 🧊 Build Image 
 ### A .  Create a  `Dockerfile`  in your project (  my-app-crud:1.0 . )
 ```
-git clone https://github.com/asher-lab/SIMPLE-CRUD-APP_DEVOPS.git
+git clone https://gitlab.com/asher-lab/SIMPLE-CRUD-APP_DEVOPS.git
 cd SIMPLE-CRUD-APP_DEVOPS
 npm install --save express mysql body-parser hbs
 ```
@@ -50,6 +60,8 @@ Create a Docker Image:
 ```
 docker build -t my-app-crud:1.0 .
 ```
+## 🧊 Security Scan
+https://github.com/docker/scan-cli-plugin
 
 ## 🧊 Publish
 ### A. Publish the image to a remote repository
@@ -193,6 +205,7 @@ docker-compose -f docker-compose.yaml up -d
 docker rm -f $(docker ps -a -q)
 docker rmi -f $(docker images -a -q)
 ```
+
 ## 🧊 Full CI/CD Pipeline
 This pipeline will:
 - Test
