@@ -12,10 +12,11 @@ const app = express();
 
 //Create Connection
 const conn = mysql.createConnection({
-    host: 'localhost',
+    host: '127.17.0.1',
+    port: '3307',
     user: 'root',
-    password: 'root',
-    database: 'crud_db'
+    password: 'newpass',
+    database: 'kaushik'
 });
 
 //connect to database
