@@ -1,0 +1,97 @@
+ON JENKINS SERVER:
+
+
+apt install npm
+chmod 666 /var/run/docker.sock
+||| install nano on jenkins as docker
+||| add id any asher-lab:Parkour@12
+||| add id dockerhub-asherlab asherlab:amtabha27
+||| add ssh agent just install without restart
+||| add gitlab as plugin on jenkins, make sure the project name is same on jenkins and gitlab on the integration part, also the password
+
+||| add ../keys/asher.pem with appropriate permissions
+
+
+ON DEPLOYMENT SERVER:
+install docker
+install docker compose
+||| run via localhost level chmod 666 /var/run/docker.sock
+
+
+
+
+ERROR:
+Theory:1
+
+
+Legitimate Requests
+No Permission Requests
+Legitimate Requests
+
+Hung UP.
+
+working:
+ssh -i awsmanangan01.pem  ubuntu@44.194.205.9 'touch pinesng'
+ssh -i awsmanangan01.pem   ubuntu@44.194.205.9 'docker images'
+scp -rp -i awsmanangan01.pem docker-compose.yaml ubuntu@44.194.205.9://home/ubuntu
+
+error: 
+ssh -i awsmanangan01.pem   ubuntu@44.194.205.9 'mkdir /home/hello'
+
+
+Theory 2: deleted authorized_keys
+
+
+
+
+
+
+
+
+
+
+working:
+ssh -i "asher.pem" ec2-user@ec2-34-234-35-40.compute-1.amazonaws.com
+
+not working:
+ssh -i "asher.pem" ec2-user@34.234.35.40
+
+ssh -i "asher.pem" ec2-user@34.234.54.40
+
+
+
+SOLUTION I TOOK:
+SSH to the server
+SSH to the opposite server
+
+ERROR I did:
+
+when I deleted UBuntu folder .ssh file also deleted
+reseting the chmod to default so I need to chmod 777
+
+so i need to only delete some file not entire ubuntu folder
+
+also authorized_keys must belong to ubuntu
+
+
+
+ERRRO COME WHEN I DELETE WHERE SSH FILE IS
+
+- workaround is I can only delete some file
+
+
+"""""""""""""""""""""
+
+authorized_keys
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBmS96f92DU00/zVSivl2tp34d+AodORCQcAT6LcBO/b awsmanangan01
+doesnt matter awsmanangan01, u can remove or chanmge
+
+.ssh owner ubuntu, permit drwx------
+authoruzedkeys, -rw------- 1 ubuntu ubuntu   87 Sep  4 11:42 authorized_keys
+ubuntu , drwxr-xr-x  5 ubuntu ubuntu 4096 Sep  4 11:42 ubuntu
+
+-stay from main ubuntu, green one, to recreate all
+
+go to root then: sudo chmod a+rwx /home, then to green again
+to create all necessary files
+ using this: https://serverfault.com/questions/695178/deleted-authorized-keys-from-ec2-but-still-have-ppk-file-and-im-connected
