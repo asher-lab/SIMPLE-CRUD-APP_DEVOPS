@@ -34,11 +34,13 @@ Build the project when triggered using Jenkins
 Implement using Gitlab and Jenkins
 ```
 ## 🧊Testing 
-
+Be sure npm is installed on your system ( of which your Jenkins server is stored). Or you can install the plugin
 `npm test`
 
 
 ## 🧊 Build Image 
+Ensure the chmod 666 are set:
+`
 ### A .  Create a  `Dockerfile`  in your project (  my-app-crud:1.0 . )
 ```
 git clone https://gitlab.com/asher-lab/SIMPLE-CRUD-APP_DEVOPS.git
@@ -79,6 +81,8 @@ Make sure the directory your are on has the following files and folders:
 - mysqldump/sql.db
 - docker-compose.yaml
 - prometheus.yml
+- credentials and IP Address of another server:
+- - be sure that SSH Agent plugin is installed
 
 Make sure your have the docker image named either locally or via remote. In case of remote, change the source of the repository in docker-compose.yaml. In certain case you need to perform docker login to access the private repository:
 
@@ -217,9 +221,6 @@ This pipeline will:
 ```
 pipeline {
     agent any
-	tools { 
-		maven 'maven-3.8.2'
-	}
 	
     stages {
 	
@@ -228,40 +229,80 @@ pipeline {
 			steps {
 				script {
 					echo "Testing the code.."
-					sh 'mvn test'
+					sh 'npm test '
 				}
 			}
 		}
 
 		
-		stage("build jar") {
-			steps {
-				script {
-					echo "Bulding the application.."
-					sh 'mvn package'
-				}
-			}
-		}
+
 
 		stage("build image") {
 			steps {
 				script {
 					echo "Building docker image.."	
-					withCredentials([usernamePassword(credentialsId: 'dockerhub-asherlab', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]){
 					
-						sh 'docker build -t java-maven-app:jma-2.2 .'
-						sh "echo $PASSWORD | docker login -u $USERNAME --password-stdin"
-						sh 'docker tag java-maven-app:jma-2.2 asherlab/java-maven-app:jma-2.2'
-						sh 'docker push asherlab/java-maven-app:jma-2.2'
-				   }
+					
+					
+						sh 'docker build -t my-app-crud:latest .'
+						withCredentials([usernamePassword(credentialsId: 'dockerhub-asherlab', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]){
+					sh "echo $PASSWORD | docker login -u $USERNAME --password-stdin"	
+					
+					}
+
+						sh 'docker tag my-app-crud:latest asherlab/my-app-crud:latest'
+						
+				   
 			   }	
 			}
 		}
 
+
+		stage("Scan Image") {
+			steps {
+				script {
+
+
+
+				echo "Performing security scan.."
+
+				
+				try {
+					sh "docker scan asherlab/my-app-crud:latest"
+				} catch (Exception e) {
+					sh " echo Security Team PLS fix the vulnerability!"
+					
+				}
+					
+					
+				}
+			}
+		}
+		
+
+		stage("Publish Image") {
+			steps {
+				script {
+					echo "Publishing Image to docker hub repo.."
+					
+					withCredentials([usernamePassword(credentialsId: 'dockerhub-asherlab', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]){
+					sh "echo $PASSWORD | docker login -u $USERNAME --password-stdin"	
+					sh 'docker push asherlab/my-app-crud:latest'
+					}
+					
+					
+				}
+			}
+		}
+
+
+		
+		
 	stage("deploy") {
 				steps {
 					script {
-				
+						
+				echo "Deploying the image to a remote EC2 instances.."
 				//login on remote server (ec2 - deployment server) so it can access the repo
 				
 				// or you can just login on the remote deployment server
@@ -272,10 +313,11 @@ pipeline {
 				
    				sshagent(['EC2-Creds']) { 
    				// some block 
-   				sh "scp -rp -i ../keys/asher.pem docker-compose.yaml ec2-user@3.89.26.116://home/ec2-user"
-   				sh "ssh -o StrictHostKeyChecking=no ec2-user@3.89.26.116 ${dockerComposeCmd}"
+				//located in var/jenkins_home/workspace/keys
+   				sh "scp -rp -i ../keys/asher.pem docker-compose.yaml ubuntu@44.194.205.9://home/ubuntu"
+   				sh "ssh -o StrictHostKeyChecking=no ubuntu@44.194.205.9 ${dockerComposeCmd}"
    				
-				
+				// make sure the host system have: SSH-Agent plugin
 					
 					}
 										
@@ -285,5 +327,12 @@ pipeline {
 }
 }
 
-
 ```
+
+
+## Deleted authorized_keys but still connected:
+https://serverfault.com/questions/695178/deleted-authorized-keys-from-ec2-but-still-have-ppk-file-and-im-connected
+https://superuser.com/questions/1295949/can-you-recover-ssh-contents-on-aws-ec2-with-an-open-session-and-keys
+
+## On permission denied on creating a dir
+https://unix.stackexchange.com/questions/119358/create-file-in-folder-permission-denied
